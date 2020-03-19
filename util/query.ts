@@ -18,7 +18,8 @@ export const withCountryRegion = (where: string, countryRegion?: string) =>
 
 export const createArrayQuery = ({ where, orderByFields }) => ({
   ...createQuery({ where }),
-  orderByFields
+  orderByFields,
+  resultRecordCount: 2000
 });
 
 export const queryConfirmed = (countryRegion?: string) =>
@@ -98,4 +99,10 @@ export const querySumSembuh = () =>
   createTotalQuery({
     where: where.indo,
     field: "Sembuh_"
+  });
+
+export const queryKasus = () =>
+  createArrayQuery({
+    where: where.indo,
+    orderByFields: "Positif asc"
   });

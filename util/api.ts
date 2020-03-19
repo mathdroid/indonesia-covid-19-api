@@ -15,7 +15,8 @@ import {
   querySumMeninggal,
   querySumTerkonfirmasi,
   querySumSembuh,
-  querySumDalamPerawatan
+  querySumDalamPerawatan,
+  queryKasus
 } from "./query";
 import { getCountryName } from "./countries";
 
@@ -56,5 +57,10 @@ export const getLastUpdate = async (countryName?: string) => {
 
 export const getDailyCases = async () =>
   (await fetchFeatures(endpoints.casesTime, queryCasesTimeSeries()))
+    .map(attributeSpreader)
+    .map(normalizeKeys);
+
+export const getAllKasus = async () =>
+  (await fetchFeatures(endpoints.kasus, queryKasus()))
     .map(attributeSpreader)
     .map(normalizeKeys);
