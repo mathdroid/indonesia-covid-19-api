@@ -91,7 +91,7 @@ export const querySumTerkonfirmasi = () =>
 export const querySumDalamPerawatan = () =>
   createTotalQuery({
     where: where.indo,
-    field: "DalamPerawatan"
+    field: "Dalam_Perawatan_"
   });
 
 export const querySumSembuh = () =>

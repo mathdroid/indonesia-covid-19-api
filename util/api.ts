@@ -21,7 +21,7 @@ import { getCountryName } from "./countries";
 
 export const getTotalConfirmed = async () => {
   return extractSingleValue(
-    await fetchFeatures(endpoints.kasus, querySumTerkonfirmasi())
+    await fetchFeatures(endpoints.perProvinsi, querySumTerkonfirmasi())
   );
 };
 
