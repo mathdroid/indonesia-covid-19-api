@@ -1,0 +1,22 @@
+{
+    "name": "@types/mime-types",
+    "version": "2.1.0",
+    "description": "TypeScript definitions for mime-types",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Gyusun Yeom",
+            "url": "https://github.com/Perlmint"
+        }
+    ],
+    "main": "",
+    "repository": {
+        "type": "git",
+        "url": "https://www.github.com/DefinitelyTyped/DefinitelyTyped.git"
+    },
+    "scripts": {},
+    "dependencies": {},
+    "peerDependencies": {},
+    "typesPublisherContentHash": "cd2abb8b2c08b67c17bc1759892e2bad498bcde36e48d21d5390cf46d6138bf9",
+    "typeScriptVersion": "2.0"
+}
