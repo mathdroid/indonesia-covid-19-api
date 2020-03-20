@@ -75,11 +75,11 @@ export const fetchJumlahKasus = async () => {
     spatialRel: `esriSpatialRelIntersects`,
     outFields: `*`,
     cacheHint: true,
-
-    where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
-    outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
+    where: `1=1`
+    // where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
+    // outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
   };
-  return extractSingleValue(await fetchFeatures(endpoint, query));
+  return await fetchFeatures(endpoint, query);
 };
 
 export const fetchProvinsiData = async (
