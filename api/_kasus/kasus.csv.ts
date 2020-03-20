@@ -1,7 +1,7 @@
 import { NowResponse } from "@now/node";
 import ObjectsToCsv from "objects-to-csv";
 
-import { fetchAllKasus } from "../util/fetcher";
+import { fetchAllKasus } from "../../util/fetcher";
 
 export default async (_, response: NowResponse) => {
   const data = await fetchAllKasus();

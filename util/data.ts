@@ -45,13 +45,13 @@ export const sanitizeResponse = (data: any[]) =>
   data.map(attributeSpreader).map(normalizeKeys);
 
 export const fetchFeatures = async (url, query = {}) => {
-  console.log(query);
+  // console.log(query);
   const endpoint = `${url}${isEmpty(query) ? "" : `?${qs.stringify(query)}`}`;
+  // console.log({ url, query: qs.parse(endpoint), endpoint });
   const response = await fetch(endpoint);
   const { features } = await response.json();
-  console.log({ url, query: qs.parse(endpoint), endpoint });
 
-  console.log(features);
+  // console.log({ features });
   if (!Array.isArray(features))
     throw new Error(`Upstream error: ${endpoint} unreachable.`);
   return sanitizeResponse(features);

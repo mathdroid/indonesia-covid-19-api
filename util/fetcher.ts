@@ -98,7 +98,7 @@ export const fetchAllKasus = async () =>
   fetchFeatures(
     `https://services8.arcgis.com/mpSDBlkEzjS62WgX/arcgis/rest/services/Kasus_COVID19_Indonesia_gsheet/FeatureServer/0/query`,
     createArrayQuery({
-      where: where.indo,
+      where: where.all,
       orderByFields: "Positif asc"
     })
   );
