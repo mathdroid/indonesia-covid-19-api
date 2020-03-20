@@ -1,4 +1,4 @@
-import { fetchFeatures } from "./data";
+import { fetchFeatures, extractSingleValue } from "./data";
 
 export const fetchDaily = () => {
   const endpoint = `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/Statistik_Perkembangan_COVID19_Indonesia/FeatureServer/0/query`;
@@ -17,7 +17,7 @@ export const fetchDaily = () => {
   return fetchFeatures(endpoint, query);
 };
 
-export const fetchMeninggal = () => {
+export const fetchMeninggal = async () => {
   const endpoint = `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/Statistik_Perkembangan_COVID19_Indonesia/FeatureServer/0/query`;
 
   const query = {
@@ -30,10 +30,10 @@ export const fetchMeninggal = () => {
     where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Meninggal",outStatisticFieldName: "value"}]`
   };
-  return fetchFeatures(endpoint, query);
+  return extractSingleValue(await fetchFeatures(endpoint, query));
 };
 
-export const fetchSembuh = () => {
+export const fetchSembuh = async () => {
   const endpoint = `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/Statistik_Perkembangan_COVID19_Indonesia/FeatureServer/0/query`;
 
   const query = {
@@ -46,10 +46,10 @@ export const fetchSembuh = () => {
     where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Sembuh",outStatisticFieldName: "value"}]`
   };
-  return fetchFeatures(endpoint, query);
+  return extractSingleValue(await fetchFeatures(endpoint, query));
 };
 
-export const fetchDalamPerawatan = () => {
+export const fetchDalamPerawatan = async () => {
   const endpoint = `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/Statistik_Perkembangan_COVID19_Indonesia/FeatureServer/0/query`;
 
   const query = {
@@ -62,10 +62,10 @@ export const fetchDalamPerawatan = () => {
     where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_pasien_dalam_perawatan",outStatisticFieldName: "value"}]`
   };
-  return fetchFeatures(endpoint, query);
+  return extractSingleValue(await fetchFeatures(endpoint, query));
 };
 
-export const fetchJumlahKasus = () => {
+export const fetchJumlahKasus = async () => {
   const endpoint = `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/Statistik_Perkembangan_COVID19_Indonesia/FeatureServer/0/query`;
 
   const query = {
@@ -78,5 +78,5 @@ export const fetchJumlahKasus = () => {
     where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
   };
-  return fetchFeatures(endpoint, query);
+  return extractSingleValue(await fetchFeatures(endpoint, query));
 };

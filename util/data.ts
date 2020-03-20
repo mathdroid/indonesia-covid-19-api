@@ -30,11 +30,7 @@ export const normalizeKeys = object => {
 };
 
 export const extractSingleValue = features =>
-  (features &&
-    features[0] &&
-    features[0].attributes &&
-    features[0].attributes.value) ||
-  0;
+  (features && features[0] && features[0].value) || 0;
 
 const isEmpty = obj => {
   for (const key in obj) {
