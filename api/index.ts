@@ -16,21 +16,13 @@ export default async (_, response: NowResponse) => {
   ]);
 
   response.json({
-    confirmed: {
-      value: confirmed,
-      detail: "https://indonesia-covid-19.mathdro.id/api/kasus"
-    },
-    recovered: {
-      value: recovered,
-      detail: "https://indonesia-covid-19.mathdro.id/api/kasus"
-    },
-    deaths: {
-      value: deaths,
-      detail: "https://indonesia-covid-19.mathdro.id/api/kasus"
-    },
-    active: {
-      value: active,
-      detail: "https://indonesia-covid-19.mathdro.id/api/kasus"
-    }
+    confirmed: confirmed,
+    recovered: recovered,
+    deaths: deaths,
+    active: active,
+
+    perKasus: "https://indonesia-covid-19.mathdro.id/api/kasus",
+
+    perProvinsi: "https://indonesia-covid-19.mathdro.id/api/provinsi"
   });
 };

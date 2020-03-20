@@ -39,8 +39,10 @@ export const getTotalDeaths = async (countryName?: string) => {
 };
 
 export const getTotalActive = async (countryName?: string) => {
-  return extractSingleValue(
-    await fetchFeatures(endpoints.kasus, querySumDalamPerawatan())
+  return (
+    extractSingleValue(
+      await fetchFeatures(endpoints.kasus, querySumDalamPerawatan())
+    ) - 1
   );
 };
 

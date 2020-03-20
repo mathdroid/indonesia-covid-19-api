@@ -1,4 +1,4 @@
-const where = {
+export const where = {
   confirmed: `(Confirmed > 0)`,
   deaths: `(Confirmed > 0) AND (Deaths > 0)`,
   recovered: `(Confirmed > 0) AND (Recovered <> 0)`,
@@ -48,9 +48,12 @@ export const queryLastUpdate = (countryRegion?: string) => ({
   resultRecordCount: 1
 });
 
+export const createOutStatistics = (field: string) =>
+  `[{"statisticType":"sum","onStatisticField":"${field}","outStatisticFieldName":"value"}]`;
+
 export const createTotalQuery = ({ where, field }) => ({
   ...createQuery({ where }),
-  outStatistics: `[{"statisticType":"sum","onStatisticField":"${field}","outStatisticFieldName":"value"}]`
+  outStatistics: createOutStatistics(field)
 });
 
 export const queryTotalConfirmed = (countryRegion?: string) =>

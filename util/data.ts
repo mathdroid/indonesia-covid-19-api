@@ -68,6 +68,7 @@ const isEmpty = obj => {
 };
 
 export const fetchFeatures = async (url, query = {}) => {
+  console.log(query);
   const endpoint = `${url}${isEmpty(query) ? "" : `?${qs.stringify(query)}`}`;
   const response = await fetch(endpoint);
   const { features } = await response.json();
