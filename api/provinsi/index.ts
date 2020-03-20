@@ -11,7 +11,7 @@ const getProvinsiData = async (
   orderByFields = "Kasus_Terkonfirmasi_Kumulatif desc"
 ) => {
   const features = await fetchFeatures(
-    endpoints.perProvinsi,
+    `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/COVID19_Indonesia_per_Provinsi/FeatureServer/0/query`,
     createArrayQuery({
       where: where.all,
       orderByFields
