@@ -1,4 +1,5 @@
 import { fetchFeatures, extractSingleValue } from "./data";
+import { createArrayQuery, where } from "./query";
 
 export const fetchDaily = () => {
   const endpoint = `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/Statistik_Perkembangan_COVID19_Indonesia/FeatureServer/0/query`;
@@ -80,3 +81,24 @@ export const fetchJumlahKasus = async () => {
   };
   return extractSingleValue(await fetchFeatures(endpoint, query));
 };
+
+export const fetchProvinsiData = async (
+  orderByFields = "Kasus_Terkonfirmasi_Akumulatif desc"
+) => {
+  return fetchFeatures(
+    `https://services5.arcgis.com/VS6HdKS0VfIhv8Ct/arcgis/rest/services/COVID19_Indonesia_per_Provinsi/FeatureServer/0/query`,
+    createArrayQuery({
+      where: where.all,
+      orderByFields
+    })
+  );
+};
+
+export const fetchAllKasus = async () =>
+  fetchFeatures(
+    `https://services8.arcgis.com/mpSDBlkEzjS62WgX/arcgis/rest/services/Kasus_COVID19_Indonesia_gsheet/FeatureServer/0/query`,
+    createArrayQuery({
+      where: where.indo,
+      orderByFields: "Positif asc"
+    })
+  );
