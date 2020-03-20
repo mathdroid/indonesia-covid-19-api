@@ -21,7 +21,7 @@ export default async (_, response: NowResponse) => {
     perawatan,
     jumlahKasus,
 
-    perKasus: "https://indonesia-covid-19.mathdro.id/api/kasus",
+    // perKasus: "https://indonesia-covid-19.mathdro.id/api/kasus",
 
     perProvinsi: "https://indonesia-covid-19.mathdro.id/api/provinsi",
     perHari: "https://indonesia-covid-19.mathdro.id/api/harian"
