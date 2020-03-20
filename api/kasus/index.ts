@@ -4,6 +4,6 @@ import { fetchAllKasus } from "../../util/fetcher";
 
 export default async (_, response: NowResponse) => {
   response.json({
-    data: fetchAllKasus()
+    data: await fetchAllKasus()
   });
 };
