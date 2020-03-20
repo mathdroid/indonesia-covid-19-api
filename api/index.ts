@@ -23,6 +23,7 @@ export default async (_, response: NowResponse) => {
 
     perKasus: "https://indonesia-covid-19.mathdro.id/api/kasus",
 
-    perProvinsi: "https://indonesia-covid-19.mathdro.id/api/provinsi"
+    perProvinsi: "https://indonesia-covid-19.mathdro.id/api/provinsi",
+    perHari: "https://indonesia-covid-19.mathdro.id/api/harian"
   });
 };
