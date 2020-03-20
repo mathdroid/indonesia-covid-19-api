@@ -1,25 +1,25 @@
 import { NowResponse } from "@now/node";
 
 import {
-  getTotalConfirmed,
-  getTotalRecovered,
-  getTotalDeaths,
-  getTotalActive
-} from "../util/api";
+  fetchMeninggal,
+  fetchSembuh,
+  fetchDalamPerawatan,
+  fetchJumlahKasus
+} from "../util/fetcher";
 
 export default async (_, response: NowResponse) => {
-  const [confirmed, recovered, deaths, active] = await Promise.all([
-    getTotalConfirmed(),
-    getTotalRecovered(),
-    getTotalDeaths(),
-    getTotalActive()
+  const [meninggal, sembuh, perawatan, jumlahKasus] = await Promise.all([
+    fetchMeninggal(),
+    fetchSembuh(),
+    fetchDalamPerawatan(),
+    fetchJumlahKasus()
   ]);
 
   response.json({
-    confirmed: confirmed,
-    recovered: recovered,
-    deaths: deaths,
-    active: active,
+    meninggal,
+    sembuh,
+    perawatan,
+    jumlahKasus,
 
     perKasus: "https://indonesia-covid-19.mathdro.id/api/kasus",
 

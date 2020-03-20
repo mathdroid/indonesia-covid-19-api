@@ -2,8 +2,6 @@ import unfetch from "isomorphic-unfetch";
 import qs from "qs";
 import withRetry from "@zeit/fetch-retry";
 
-import { countries, iso3 } from "./countries";
-
 const fetch = withRetry(unfetch);
 
 export const attributeSpreader = ({ attributes }) => ({
@@ -31,26 +29,6 @@ export const normalizeKeys = object => {
     }, {});
 };
 
-export const matchCountryCode = update => {
-  const countryCode = Object.entries(countries).find(
-    country => country[0] === update.countryRegion
-  );
-  if (countryCode) {
-    update.iso2 = countryCode[1];
-  }
-  return update;
-};
-
-export const getIso3Code = update => {
-  const countryCode3 = Object.entries(iso3).find(
-    country => country[0] === update.iso2
-  );
-  if (countryCode3) {
-    update.iso3 = countryCode3[1];
-  }
-  return update;
-};
-
 export const extractSingleValue = features =>
   (features &&
     features[0] &&
@@ -67,13 +45,18 @@ const isEmpty = obj => {
   return true;
 };
 
+export const sanitizeResponse = (data: any[]) =>
+  data.map(attributeSpreader).map(normalizeKeys);
+
 export const fetchFeatures = async (url, query = {}) => {
   console.log(query);
   const endpoint = `${url}${isEmpty(query) ? "" : `?${qs.stringify(query)}`}`;
   const response = await fetch(endpoint);
   const { features } = await response.json();
-  console.log({ url, query, endpoint, features });
-  if (typeof features === "undefined")
+  console.log({ url, query: qs.parse(endpoint), endpoint });
+
+  console.log(features);
+  if (!Array.isArray(features))
     throw new Error(`Upstream error: ${endpoint} unreachable.`);
-  return features;
+  return sanitizeResponse(features);
 };
