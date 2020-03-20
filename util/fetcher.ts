@@ -28,7 +28,7 @@ export const fetchMeninggal = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
+    where: `Tanggal>=timestamp '2020-03-19 17:00:00' AND Tanggal<=timestamp '2020-03-20 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Meninggal",outStatisticFieldName: "value"}]`
   };
   return extractSingleValue(await fetchFeatures(endpoint, query));
@@ -44,7 +44,7 @@ export const fetchSembuh = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
+    where: `Tanggal>=timestamp '2020-03-19 17:00:00' AND Tanggal<=timestamp '2020-03-20 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Sembuh",outStatisticFieldName: "value"}]`
   };
   return extractSingleValue(await fetchFeatures(endpoint, query));
@@ -60,7 +60,7 @@ export const fetchDalamPerawatan = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
+    where: `Tanggal>=timestamp '2020-03-19 17:00:00' AND Tanggal<=timestamp '2020-03-20 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_pasien_dalam_perawatan",outStatisticFieldName: "value"}]`
   };
   return extractSingleValue(await fetchFeatures(endpoint, query));
@@ -76,7 +76,7 @@ export const fetchJumlahKasus = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: `Tanggal>=timestamp '2020-03-18 17:00:00' AND Tanggal<=timestamp '2020-03-19 16:59:59'`,
+    where: `Tanggal>=timestamp '2020-03-19 17:00:00' AND Tanggal<=timestamp '2020-03-20 16:59:59'`,
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
   };
   return extractSingleValue(await fetchFeatures(endpoint, query));
