@@ -1,6 +1,6 @@
 import unfetch from "isomorphic-unfetch";
-import qs from "qs";
 import withRetry from "@zeit/fetch-retry";
+import qs from "qs";
 
 const fetch = withRetry(unfetch);
 

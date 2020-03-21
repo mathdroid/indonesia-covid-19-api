@@ -1,3 +1,8 @@
+import unfetch from "isomorphic-unfetch";
+import withRetry from "@zeit/fetch-retry";
+
+const fetch = withRetry(unfetch);
+
 import { fetchFeatures, extractSingleValue } from "./data";
 import { createArrayQuery, where } from "./query";
 import { endpoints } from "./endpoints";
@@ -106,3 +111,6 @@ export const fetchAllKasus = async () =>
       orderByFields: "Positif asc"
     })
   );
+
+export const fetchCaseGraph = async () =>
+  fetch(`http://covid-monitoring2.kemkes.go.id/`).then(res => res.json());
