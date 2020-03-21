@@ -8,8 +8,12 @@ const boldInter = readFileSync(
 ).toString("base64");
 
 function getCss(width: number, height: number, imagesLength = 450) {
-  const imageWidth =
-    Math.floor(Math.sqrt(((width - 64) * (height - 64)) / imagesLength)) - 2;
+  const areaRoot = Math.floor(
+    Math.sqrt(((width - 64) * (height - 64)) / imagesLength)
+  );
+  const marginSize = Math.floor(areaRoot / 8);
+  const safetyMargin = 2;
+  const imageWidth = areaRoot - 2 * marginSize - safetyMargin;
   return `
   @font-face {
     font-family: 'Inter';
@@ -54,6 +58,7 @@ body {
 
 .person {
   width: ${imageWidth}px;
+  margin: ${marginSize}px;
 }
 
   `;

@@ -8,7 +8,7 @@ const isDev = process.env.NOW_REGION === "dev1";
 
 const isDead = node => node.status === "Meninggal";
 const isRecovered = node => node.status === "Sembuh";
-const isMale = node => node.genderxid === 1;
+const isMale = node => node.genderid === 1 || node.genderxid === 1;
 const isBaby = node => node.umur <= 5;
 const isYoung = node => !isBaby(node) && node.umur <= 20;
 const isAdultBelow50 = node => !isYoung(node) && node.umur <= 50;
@@ -98,6 +98,13 @@ const getRecoveredEmoji = node =>
 const sortByKasus = (nodeA, nodeB) => nodeA.kasus - nodeB.kasus;
 
 const getEmoji = node => {
+  // console.log(
+  //   isMale(node),
+  //   node.gender,
+  //   node.genderid,
+  //   node.genderxid,
+  //   node.kasus
+  // );
   if (isDead(node)) {
     return "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png";
   }
@@ -120,7 +127,11 @@ const getEmoji = node => {
 
 const srcToImg = ({ src, node }) =>
   `<img src="${src}" class="person" ${
-    isDev ? `data="${JSON.stringify(node)}"` : ""
+    isDev
+      ? `data="${Object.entries(node)
+          .map(d => d.join("="))
+          .join("&")}"`
+      : ""
   } />`;
 
 export default async function handler(req: NowRequest, res: NowResponse) {
