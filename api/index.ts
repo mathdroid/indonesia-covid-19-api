@@ -23,7 +23,9 @@ export default async (_, response: NowResponse) => {
 
     perKasus: {
       json: "https://indonesia-covid-19.mathdro.id/api/kasus",
-      csv: "https://indonesia-covid-19.mathdro.id/api/kasus.csv"
+      csv: "https://indonesia-covid-19.mathdro.id/api/kasus.csv",
+      links: "https://indonesia-covid-19.mathdro.id/api/kasus/links.csv",
+      old: "https://indonesia-covid-19.mathdro.id/api/kasus/old"
     },
     perProvinsi: {
       json: "https://indonesia-covid-19.mathdro.id/api/provinsi",
