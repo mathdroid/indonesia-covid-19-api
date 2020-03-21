@@ -7,11 +7,6 @@ import { fetchFeatures, extractSingleValue } from "./data";
 import { createArrayQuery, where } from "./query";
 import { endpoints } from "./endpoints";
 
-// const addDays = (date: Date, days: number) => new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
-// const yesterday = addDays(today, -1)
-
-// const yesterDate = yesterday.toISOString().split('T')[0]
-
 export const fetchDaily = () => {
   const query = {
     f: "json",
