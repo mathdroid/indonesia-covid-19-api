@@ -6,11 +6,12 @@ const fetch = withRetry(unfetch);
 import { fetchFeatures, extractSingleValue } from "./data";
 import { createArrayQuery, where } from "./query";
 import { endpoints } from "./endpoints";
+import { addDays } from "./date";
 
-export const fetchDaily = () => {
+export const fetchDaily = (date = new Date()) => {
   const query = {
     f: "json",
-    where: where.beforeToday,
+    where: where.beforeToday(date),
     returnGeometry: false,
     spatialRel: `esriSpatialRelIntersects`,
     outFields: `*`,
@@ -22,7 +23,7 @@ export const fetchDaily = () => {
   return fetchFeatures(endpoints.statistikPerkembangan, query);
 };
 
-export const fetchMeninggal = async () => {
+export const fetchMeninggal = async (date = new Date()) => {
   const query = {
     f: "json",
     returnGeometry: false,
@@ -30,15 +31,17 @@ export const fetchMeninggal = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: where.currentDay,
+    where: where.currentDay(date),
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Meninggal",outStatisticFieldName: "value"}]`
   };
-  return extractSingleValue(
+  const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)
   );
+
+  return result > 0 ? result : fetchMeninggal(addDays(date, -1));
 };
 
-export const fetchSembuh = async () => {
+export const fetchSembuh = async (date = new Date()) => {
   const query = {
     f: "json",
     returnGeometry: false,
@@ -46,15 +49,17 @@ export const fetchSembuh = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: where.currentDay,
+    where: where.currentDay(date),
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Sembuh",outStatisticFieldName: "value"}]`
   };
-  return extractSingleValue(
+  const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)
   );
+
+  return result > 0 ? result : fetchSembuh(addDays(date, -1));
 };
 
-export const fetchDalamPerawatan = async () => {
+export const fetchDalamPerawatan = async (date = new Date()) => {
   const query = {
     f: "json",
     returnGeometry: false,
@@ -62,15 +67,17 @@ export const fetchDalamPerawatan = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: where.currentDay,
+    where: where.currentDay(date),
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_pasien_dalam_perawatan",outStatisticFieldName: "value"}]`
   };
-  return extractSingleValue(
+  const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)
   );
+
+  return result > 0 ? result : fetchDalamPerawatan(addDays(date, -1));
 };
 
-export const fetchJumlahKasus = async () => {
+export const fetchJumlahKasus = async (date = new Date()) => {
   const query = {
     f: "json",
     returnGeometry: false,
@@ -78,12 +85,14 @@ export const fetchJumlahKasus = async () => {
     outFields: `*`,
     cacheHint: true,
 
-    where: where.currentDay,
+    where: where.currentDay(date),
     outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
   };
-  return extractSingleValue(
+  const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)
   );
+
+  return result > 0 ? result : fetchJumlahKasus(addDays(date, -1));
 };
 
 export const fetchProvinsiData = async (

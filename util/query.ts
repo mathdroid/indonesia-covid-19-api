@@ -1,17 +1,6 @@
 // (Tanggal>=timestamp '2020-03-20 17:00:00' AND Tanggal<=timestamp '2020-03-21 16:59:59' OR Tanggal>=timestamp '2020-03-19 17:00:00' AND Tanggal<=timestamp '2020-03-20 16:59:59')
 
-const addDays = (date: Date, days: number) =>
-  new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
-const getISODate = (date: Date) => date.toISOString().split("T")[0];
-
-const tomorrow = new Date();
-
-const today = addDays(tomorrow, -1);
-const yesterday = addDays(tomorrow, -2);
-
-const toDate = getISODate(today);
-const yesterDate = getISODate(yesterday);
-const tomDate = getISODate(tomorrow);
+import { addDays, getISODate } from "./date";
 
 export const where = {
   confirmed: `(Confirmed > 0)`,
@@ -19,8 +8,16 @@ export const where = {
   recovered: `(Confirmed > 0) AND (Recovered <> 0)`,
   all: `1=1`,
   indo: `(Provinsi = 'Indonesia') OR (Provinsi <> 'Indonesia')`,
-  currentDay: `(Tanggal>=timestamp '${toDate} 17:00:00' AND Tanggal<=timestamp '${tomDate} 16:59:59' OR Tanggal>=timestamp '${yesterDate} 17:00:00' AND Tanggal<=timestamp '${toDate} 16:59:59')`,
-  beforeToday: `Tanggal<timestamp '${toDate} 17:00:00'`
+  currentDay: (date: Date) =>
+    `(Tanggal>=timestamp '${getISODate(
+      date
+    )} 17:00:00' AND Tanggal<=timestamp '${getISODate(
+      addDays(date, 1)
+    )} 16:59:59' OR Tanggal>=timestamp '${getISODate(
+      addDays(date, -1)
+    )} 17:00:00' AND Tanggal<=timestamp '${getISODate(date)} 16:59:59')`,
+  beforeToday: (date: Date) =>
+    `Tanggal<timestamp '${getISODate(date)} 17:00:00'`
 };
 
 export const createQuery = ({ where }) => ({
