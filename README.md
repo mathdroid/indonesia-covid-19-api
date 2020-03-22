@@ -1,5 +1,5 @@
 # Indonesia COVID 19 API
-> Serving COVID-19 Indonesia data as a [JSON API](https://indonesia-covid-19.mathdro.id/)
+> Serving Indonesian COVID-19 data as [JSON API](https://indonesia-covid-19.mathdro.id/)
 
 ## Routes
 
