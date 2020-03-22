@@ -48,9 +48,8 @@ body {
   display: flex;
   flex-flow: wrap row;
   height: 100%;
-  text-align: center;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   line-height: 2rem;
   letter-spacing: 4px;
   font-size: 1.5rem;
@@ -59,6 +58,20 @@ body {
 .person {
   width: ${imageWidth}px;
   margin: ${marginSize}px;
+}
+
+.img {
+  position: absolute;
+  width: ${imageWidth}px;
+}
+
+.back {
+  z-index: 0;
+  filter: grayscale(0.8);
+}
+
+.front {
+  z-index: 2;
 }
 
   `;

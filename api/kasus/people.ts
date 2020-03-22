@@ -108,13 +108,13 @@ const getEmoji = (node, isMonochrome) => {
   //   node.genderxid,
   //   node.kasus
   // );
-  if (isDead(node)) {
-    return "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png";
-  }
+  // if (isDead(node)) {
+  //   return "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png";
+  // }
 
-  if (isRecovered(node)) {
-    return getRecoveredEmoji(node, isMonochrome);
-  }
+  // if (isRecovered(node)) {
+  //   return getRecoveredEmoji(node, isMonochrome);
+  // }
   if (isBaby(node)) {
     return emojis.baby[getVariant(node, isMonochrome)];
   }
@@ -134,14 +134,18 @@ const getEmoji = (node, isMonochrome) => {
   }
 };
 
-const srcToImg = ({ src, node }) =>
-  `<img src="${src}" class="person" ${
-    isDev
-      ? `data="${Object.entries(node)
-          .map(d => d.join("="))
-          .join("&")}"`
-      : ""
-  } />`;
+const srcToImg = ({ src, node, isNodeDead, isNodeRecovered }) =>
+  isNodeDead
+    ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png" /></div>`
+    : isNodeRecovered
+    ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/seedling_1f331.png" /></div>`
+    : `<img src="${src}" class="person" ${
+        isDev
+          ? `data="${Object.entries(node)
+              .map(d => d.join("="))
+              .join("&")}"`
+          : ""
+      } />`;
 
 export default async function handler(req: NowRequest, res: NowResponse) {
   try {
@@ -155,7 +159,12 @@ export default async function handler(req: NowRequest, res: NowResponse) {
     // res.json({ cases });
     const sorted = nodes.sort(sortByKasus);
     const emojis = sorted
-      .map(n => ({ src: getEmoji(n, isMonochrome), node: n }))
+      .map(n => ({
+        src: getEmoji(n, isMonochrome),
+        node: n,
+        isNodeDead: isDead(n),
+        isNodeRecovered: isRecovered(n)
+      }))
       .map(srcToImg);
 
     const html = getHtml({
