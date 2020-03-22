@@ -7,6 +7,7 @@ import { fetchFeatures, extractSingleValue } from "./data";
 import { createArrayQuery, where } from "./query";
 import { endpoints } from "./endpoints";
 import { addDays } from "./date";
+import { kasus } from "./kasus";
 
 export const fetchDaily = (date = new Date()) => {
   const query = {
@@ -114,5 +115,4 @@ export const fetchAllKasus = async () =>
     })
   );
 
-export const fetchCaseGraph = async () =>
-  fetch(`http://covid-monitoring2.kemkes.go.id/`).then(res => res.json());
+export const fetchCaseGraph = async () => kasus;
