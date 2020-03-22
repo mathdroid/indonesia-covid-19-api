@@ -11,7 +11,7 @@ export async function writeTempFile(name: string, contents: string) {
       .update(name)
       .digest("hex") + ".html";
   const filePath = join(tmpdir(), fileName);
-  console.log(`Writing file ${name} to ${filePath}`);
+  console.log(`Writing file ${name.slice(0, 10)} to ${filePath}`);
   await writeFileAsync(filePath, contents);
   return filePath;
 }

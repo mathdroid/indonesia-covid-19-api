@@ -154,12 +154,12 @@ export default async function handler(req: NowRequest, res: NowResponse) {
     const [{ nodes }] = await Promise.all([fetchCaseGraph()]);
     // res.json({ cases });
     const sorted = nodes.sort(sortByKasus);
+    const emojis = sorted
+      .map(n => ({ src: getEmoji(n, isMonochrome), node: n }))
+      .map(srcToImg);
 
     const html = getHtml({
-      //@ts-ignore
-      emojis: sorted
-        .map(n => ({ src: getEmoji(n, isMonochrome), node: n }))
-        .map(srcToImg),
+      emojis,
       width,
       height
     });
@@ -168,7 +168,11 @@ export default async function handler(req: NowRequest, res: NowResponse) {
       res.end(html);
       return;
     }
-    const text = "textwoot";
+    const text = JSON.stringify({
+      emojis,
+      width,
+      height
+    });
     const filePath = await writeTempFile(text, html);
     const fileUrl = pathToFileURL(filePath);
     const file = await getScreenshot(fileUrl, isDev, width, height);
