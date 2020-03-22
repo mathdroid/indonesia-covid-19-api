@@ -95,9 +95,7 @@ export const fetchJumlahKasus = async (date = new Date()) => {
   return result > 0 ? result : fetchJumlahKasus(addDays(date, -1));
 };
 
-export const fetchProvinsiData = async (
-  orderByFields = "Kasus_Terkonfirmasi_Akumulatif desc"
-) => {
+export const fetchProvinsiData = async (orderByFields = "Kasus_Posi desc") => {
   return fetchFeatures(
     endpoints.perProvinsi,
     createArrayQuery({

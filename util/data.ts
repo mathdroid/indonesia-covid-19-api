@@ -46,7 +46,7 @@ export const sanitizeResponse = (data: any[]) =>
 
 export const fetchFeatures = async (url: string, query = {}) => {
   const endpoint = `${url}${isEmpty(query) ? "" : `?${qs.stringify(query)}`}`;
-  // console.log({ url, query: qs.parse(endpoint), endpoint });
+  console.log({ url, query: qs.parse(endpoint), endpoint });
   const response = await fetch(endpoint);
 
   const json = await response.json();
