@@ -67,11 +67,14 @@ body {
 
 .back {
   z-index: 0;
-  filter: grayscale(0.8);
+  filter: contrast(0.5);
 }
 
 .front {
   z-index: 2;
+  margin-top: 8px;
+  margin-left: 8px;
+  width: ${imageWidth - 8}px;
 }
 
   `;
