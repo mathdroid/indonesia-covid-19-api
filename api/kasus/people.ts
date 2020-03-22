@@ -13,7 +13,8 @@ const isBaby = node => node.umur <= 5;
 const isYoung = node => !isBaby(node) && node.umur <= 20;
 const isAdultBelow50 = node => !isYoung(node) && node.umur <= 50;
 
-const getVariant = node => ((node.kasus * node.umur) % 5) + 1;
+const getVariant = (node, isMonochrome) =>
+  isMonochrome ? 0 : ((node.kasus * node.umur) % 5) + 1;
 
 const emojis = {
   recovered: {
@@ -92,12 +93,14 @@ const emojis = {
   }
 };
 
-const getRecoveredEmoji = node =>
-  emojis.recovered[isMale(node) ? "male" : "female"][getVariant(node)];
+const getRecoveredEmoji = (node, isMonochrome) =>
+  emojis.recovered[isMale(node) ? "male" : "female"][
+    getVariant(node, isMonochrome)
+  ];
 
 const sortByKasus = (nodeA, nodeB) => nodeA.kasus - nodeB.kasus;
 
-const getEmoji = node => {
+const getEmoji = (node, isMonochrome) => {
   // console.log(
   //   isMale(node),
   //   node.gender,
@@ -110,18 +113,24 @@ const getEmoji = node => {
   }
 
   if (isRecovered(node)) {
-    return getRecoveredEmoji(node);
+    return getRecoveredEmoji(node, isMonochrome);
   }
   if (isBaby(node)) {
-    return emojis.baby[getVariant(node)];
+    return emojis.baby[getVariant(node, isMonochrome)];
   }
   if (isYoung(node)) {
-    return emojis[isMale(node) ? "boy" : "girl"][getVariant(node)];
+    return emojis[isMale(node) ? "boy" : "girl"][
+      getVariant(node, isMonochrome)
+    ];
   }
   if (isAdultBelow50(node)) {
-    return emojis[isMale(node) ? "man" : "woman"][getVariant(node)];
+    return emojis[isMale(node) ? "man" : "woman"][
+      getVariant(node, isMonochrome)
+    ];
   } else {
-    return emojis[isMale(node) ? "olderMan" : "olderWoman"][getVariant(node)];
+    return emojis[isMale(node) ? "olderMan" : "olderWoman"][
+      getVariant(node, isMonochrome)
+    ];
   }
 };
 
@@ -141,13 +150,16 @@ export default async function handler(req: NowRequest, res: NowResponse) {
     const isHtmlDebug =
       isDev &&
       (process.env.OG_HTML_DEBUG === "1" || req.query.debug === "true");
+    const isMonochrome = req.query.mono === "true";
     const [{ nodes }] = await Promise.all([fetchCaseGraph()]);
     // res.json({ cases });
     const sorted = nodes.sort(sortByKasus);
 
     const html = getHtml({
       //@ts-ignore
-      emojis: sorted.map(n => ({ src: getEmoji(n), node: n })).map(srcToImg),
+      emojis: sorted
+        .map(n => ({ src: getEmoji(n, isMonochrome), node: n }))
+        .map(srcToImg),
       width,
       height
     });
