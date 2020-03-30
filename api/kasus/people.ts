@@ -155,9 +155,9 @@ export default async function handler(req: NowRequest, res: NowResponse) {
       isDev &&
       (process.env.OG_HTML_DEBUG === "1" || req.query.debug === "true");
     const isMonochrome = req.query.mono === "true";
-    const [{ nodes }] = await Promise.all([fetchCaseGraph()]);
+    const [{ data }] = await Promise.all([fetchCaseGraph()]);
     // res.json({ cases });
-    const sorted = nodes.sort(sortByKasus);
+    const sorted = data.sort(sortByKasus);
     const emojis = sorted
       .map(n => ({
         src: getEmoji(n, isMonochrome),
