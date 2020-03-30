@@ -8,7 +8,10 @@ export const fetchWismaAtletRuangan = async () => {
   return (
     await fetch(`https://u071.zicare.id/masterdata/getRuangRawat`, {
       method: "POST",
-      body: JSON.stringify({})
+      body: JSON.stringify({}),
+      headers: {
+        "x-requested-with": "XMLHttpRequest"
+      }
     }).then(res => res.json())
   ).recap[0];
 };
@@ -17,7 +20,10 @@ export const fetchWismaAtletKaryawan = async () => {
   return (
     await fetch(`https://u071.zicare.id/masterdata/getKaryawan`, {
       method: "POST",
-      body: JSON.stringify({})
+      body: JSON.stringify({}),
+      headers: {
+        "x-requested-with": "XMLHttpRequest"
+      }
     }).then(res => res.json())
   ).recap[0];
 };
