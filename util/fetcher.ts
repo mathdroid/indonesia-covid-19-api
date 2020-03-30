@@ -115,7 +115,19 @@ export const fetchAllKasus = async () =>
     })
   );
 
-export const fetchCaseGraph = async () =>
-  fetch(`https://covid-monitoring2.kemkes.go.id/surveillance`).then(res =>
-    res.json()
-  );
+export const fetchCaseGraph = async () => {
+  return (
+    await fetch(
+      `https://covid-monitoring2.kemkes.go.id/surveillance`
+    ).then(res => res.json())
+  ).sort((a, b) => (a.id_pasien < b.id_pasien ? -1 : 1));
+};
+
+export const fetchWismaAtlet = async () => {
+  return (
+    await fetch(`https://u071.zicare.id/house/getPatientStatus`, {
+      method: "POST",
+      body: JSON.stringify({})
+    }).then(res => res.json())
+  ).recap[0];
+};
