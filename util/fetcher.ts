@@ -124,10 +124,18 @@ export const fetchCaseGraph = async () => {
 };
 
 export const fetchWismaAtlet = async () => {
-  return (
+  const stats = (
     await fetch(`https://u071.zicare.id/house/getPatientStatus`, {
       method: "POST",
       body: JSON.stringify({})
     }).then(res => res.json())
   ).recap[0];
+
+  return Object.entries(stats).reduce(
+    (acc, [key, value]) => ({
+      ...acc,
+      [key]: parseInt(value as string, 10)
+    }),
+    {}
+  );
 };

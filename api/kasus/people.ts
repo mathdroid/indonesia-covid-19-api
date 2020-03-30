@@ -6,9 +6,9 @@ import { fetchCaseGraph } from "../../util/fetcher";
 
 const isDev = process.env.NOW_REGION === "dev1";
 
-const isDead = node => node.status === "Meninggal";
-const isRecovered = node => node.status === "Sembuh";
-const isMale = node => node.genderid === 1 || node.genderxid === 1;
+const isDead = node => node.keterangan_status === "Meninggal";
+const isRecovered = node => node.keterangan_status === "Sembuh";
+const isMale = node => node.jenis_kelamin === "L";
 const isBaby = node => node.umur <= 5;
 const isYoung = node => !isBaby(node) && node.umur <= 20;
 const isAdultBelow50 = node => !isYoung(node) && node.umur <= 50;
