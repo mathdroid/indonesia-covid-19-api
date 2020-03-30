@@ -115,4 +115,7 @@ export const fetchAllKasus = async () =>
     })
   );
 
-export const fetchCaseGraph = async () => kasus;
+export const fetchCaseGraph = async () =>
+  fetch(`https://covid-monitoring2.kemkes.go.id/surveillance`).then(res =>
+    res.json()
+  );
