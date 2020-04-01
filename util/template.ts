@@ -13,7 +13,10 @@ function getCss(width: number, height: number, imagesLength = 450) {
   );
   const marginSize = Math.floor(areaRoot / 8);
   const safetyMargin = 2;
-  const imageWidth = areaRoot - 2 * marginSize - safetyMargin;
+  const imageWidth = Math.min(
+    areaRoot - 2 * marginSize - safetyMargin,
+    Math.floor(width / 4)
+  );
   const frontMargin = Math.floor(imageWidth * 0.4);
   return `
   @font-face {

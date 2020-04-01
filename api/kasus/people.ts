@@ -164,46 +164,19 @@ const emojiMapper = meta => ({
 const sortByKasus = (pasienA, pasienB) =>
   pasienA.kode_pasien - pasienB.kode_pasien;
 
-// const getEmoji = (node, isMonochrome) => {
-//   if (!node.jenis_kelamin)
-//     console.log(isMale(node), node.umur, node.jenis_kelamin);
-//   //   node.gender,
-//   //   node.genderid,
-//   //   node.genderxid,
-//   //   node.kasus
-//   // );
-//   // if (isDead(node)) {
-//   //   return "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png";
-//   // }
-
-//   // if (isRecovered(node)) {
-//   //   return getRecoveredEmoji(node, isMonochrome);
-//   // }
-//   if (isBaby(node)) {
-//     return emojis.baby[getVariant(node, isMonochrome)];
-//   }
-//   if (isYoung(node)) {
-//     return emojis[isMale(node) ? "boy" : "girl"][
-//       getVariant(node, isMonochrome)
-//     ];
-//   }
-//   if (isAdultBelow50(node)) {
-//     return emojis[isMale(node) ? "man" : "woman"][
-//       getVariant(node, isMonochrome)
-//     ];
-//   } else {
-//     return emojis[isMale(node) ? "olderMan" : "olderWoman"][
-//       getVariant(node, isMonochrome)
-//     ];
-//   }
-// };
-
 const srcToImg = ({ src, status }) =>
   status === "Meninggal"
     ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/cross-mark_274c.png" /></div>`
     : status === "Sembuh"
     ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/white-heavy-check-mark_2705.png" /></div>`
-    : `<img src="${src}" class="person" />`;
+    : `<div class="person"><img src="${src}" class="img" /></div>`;
+
+const dateReducer = (accumulated, current) => {
+  return {
+    ...accumulated,
+    [current.added_date]: (accumulated[current.added_date] || 0) + 1
+  };
+};
 
 export default async function handler(req: NowRequest, res: NowResponse) {
   try {
@@ -212,11 +185,15 @@ export default async function handler(req: NowRequest, res: NowResponse) {
     const isHtmlDebug =
       isDev &&
       (process.env.OG_HTML_DEBUG === "1" || req.query.debug === "true");
-    const isMonochrome = req.query.mono === "true";
+    const daysOffset = req.query.daysOffset
+      ? parseInt(req.query.daysOffset as string, 10)
+      : 0;
     const data = await fetchCaseGraph();
-    // res.json({ cases });
+    const days = Object.keys(data.reduce(dateReducer, {}));
+    const day = days.slice(-1 * daysOffset - 1)[0];
     const sorted = data.sort(sortByKasus);
     const emojis = sorted
+      .filter(p => p.added_date <= day)
       .map(metaMapper)
       .map(emojiMapper)
       .map(srcToImg);
