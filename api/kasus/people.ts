@@ -6,36 +6,33 @@ import { fetchCaseGraph } from "../../util/fetcher";
 
 const isDev = process.env.NOW_REGION === "dev1";
 
-const isDead = node => node.keterangan_status === "Meninggal";
-const isRecovered = node => node.keterangan_status === "Sembuh";
-const isMale = node => node.jenis_kelamin === "L";
-const isBaby = node => node.umur <= 5;
-const isYoung = node => !isBaby(node) && node.umur <= 20;
-const isAdultBelow50 = node => !isYoung(node) && node.umur <= 50;
+const getAgeKey = pasien => {
+  if (!pasien.umur) return `U`;
+  if (pasien.umur < 5) {
+    return `B`;
+  } else if (pasien.umur < 19) {
+    return `A`;
+  } else if (pasien.umur < 50) {
+    return `D`;
+  } else {
+    return `T`;
+  }
+};
 
-const getVariant = (node, isMonochrome) =>
-  isMonochrome ? 0 : ((node.kasus * node.umur) % 5) + 1;
+// const umurReducer = (accumulated, current) => {
+//   const ageKey = getAgeKey(current)
+//   return {
+//     ...accumulated,
+//     [ageKey]: {
+//       L: (accumulated[ageKey] && accumulated[ageKey].L || 0) + (current.jenis_kelamin === 1 ? 1 : 0),
+//       P: (accumulated[ageKey] && accumulated[ageKey].P || 0) + (current.jenis_kelamin === 0 ? 1 : 0),
+//       U: (accumulated[ageKey] && accumulated[ageKey].U || 0) + (current.jenis_kelamin === 2 ? 1 : 0),
+//     }
+//   }
+// }
 
 const emojis = {
-  recovered: {
-    male: {
-      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-gesturing-ok_1f646-200d-2642-fe0f.png`,
-      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-gesturing-ok-type-1-2_1f646-1f3fb-200d-2642-fe0f.png`,
-      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-gesturing-ok-type-3_1f646-1f3fc-200d-2642-fe0f.png`,
-      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-gesturing-ok-type-4_1f646-1f3fd-200d-2642-fe0f.png`,
-      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-gesturing-ok-type-5_1f646-1f3fe-200d-2642-fe0f.png`,
-      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-gesturing-ok-type-6_1f646-1f3ff-200d-2642-fe0f.png`
-    },
-    female: {
-      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-gesturing-ok_1f646-200d-2640-fe0f.png`,
-      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-gesturing-ok-type-1-2_1f646-1f3fb-200d-2640-fe0f.png`,
-      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-gesturing-ok-type-3_1f646-1f3fc-200d-2640-fe0f.png`,
-      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-gesturing-ok-type-4_1f646-1f3fd-200d-2640-fe0f.png`,
-      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-gesturing-ok-type-5_1f646-1f3fe-200d-2640-fe0f.png`,
-      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-gesturing-ok-type-6_1f646-1f3ff-200d-2640-fe0f.png`
-    }
-  },
-  baby: {
+  B: {
     0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/baby_1f476.png`,
     1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/baby_emoji-modifier-fitzpatrick-type-1-2_1f476-1f3fb_1f3fb.png`,
     2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/baby_emoji-modifier-fitzpatrick-type-3_1f476-1f3fc_1f3fc.png`,
@@ -43,109 +40,170 @@ const emojis = {
     4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/baby_emoji-modifier-fitzpatrick-type-5_1f476-1f3fe_1f3fe.png`,
     5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/baby_emoji-modifier-fitzpatrick-type-6_1f476-1f3ff_1f3ff.png`
   },
-  boy: {
-    0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_1f466.png`,
-    1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-1-2_1f466-1f3fb_1f3fb.png`,
-    2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-3_1f466-1f3fc_1f3fc.png`,
-    3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-4_1f466-1f3fd_1f3fd.png`,
-    4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-5_1f466-1f3fe_1f3fe.png`,
-    5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-6_1f466-1f3ff_1f3ff.png`
+  A: {
+    U: {
+      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/child_1f9d2.png`,
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/child_emoji-modifier-fitzpatrick-type-1-2_1f9d2-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/child_emoji-modifier-fitzpatrick-type-3_1f9d2-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/child_emoji-modifier-fitzpatrick-type-4_1f9d2-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/child_emoji-modifier-fitzpatrick-type-5_1f9d2-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/child_emoji-modifier-fitzpatrick-type-6_1f9d2-1f3ff_1f3ff.png`
+    },
+    L: {
+      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_1f466.png`,
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-1-2_1f466-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-3_1f466-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-4_1f466-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-5_1f466-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/boy_emoji-modifier-fitzpatrick-type-6_1f466-1f3ff_1f3ff.png`
+    },
+    P: {
+      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_1f467.png`,
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-1-2_1f467-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-3_1f467-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-4_1f467-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-5_1f467-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-6_1f467-1f3ff_1f3ff.png`
+    }
   },
-  girl: {
-    0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_1f467.png`,
-    1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-1-2_1f467-1f3fb_1f3fb.png`,
-    2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-3_1f467-1f3fc_1f3fc.png`,
-    3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-4_1f467-1f3fd_1f3fd.png`,
-    4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-5_1f467-1f3fe_1f3fe.png`,
-    5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/girl_emoji-modifier-fitzpatrick-type-6_1f467-1f3ff_1f3ff.png`
+  D: {
+    U: {
+      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/adult_1f9d1.png`,
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/adult_emoji-modifier-fitzpatrick-type-1-2_1f9d1-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/adult_emoji-modifier-fitzpatrick-type-3_1f9d1-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/adult_emoji-modifier-fitzpatrick-type-4_1f9d1-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/adult_emoji-modifier-fitzpatrick-type-5_1f9d1-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/adult_emoji-modifier-fitzpatrick-type-6_1f9d1-1f3ff_1f3ff.png`
+    },
+    L: {
+      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_1f468.png`,
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-1-2_1f468-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-3_1f468-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-4_1f468-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-5_1f468-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-6_1f468-1f3ff_1f3ff.png`
+    },
+    P: {
+      0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_1f469.png`,
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-1-2_1f469-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-3_1f469-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-4_1f469-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-5_1f469-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-6_1f469-1f3ff_1f3ff.png`
+    }
   },
-  man: {
-    0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_1f468.png`,
-    1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-1-2_1f468-1f3fb_1f3fb.png`,
-    2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-3_1f468-1f3fc_1f3fc.png`,
-    3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-4_1f468-1f3fd_1f3fd.png`,
-    4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-5_1f468-1f3fe_1f3fe.png`,
-    5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man_emoji-modifier-fitzpatrick-type-6_1f468-1f3ff_1f3ff.png`
+  T: {
+    U: {
+      0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-adult_1f9d3.png",
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-adult_emoji-modifier-fitzpatrick-type-1-2_1f9d3-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-adult_emoji-modifier-fitzpatrick-type-3_1f9d3-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-adult_emoji-modifier-fitzpatrick-type-4_1f9d3-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-adult_emoji-modifier-fitzpatrick-type-5_1f9d3-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-adult_emoji-modifier-fitzpatrick-type-6_1f9d3-1f3ff_1f3ff.png`
+    },
+    L: {
+      0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_1f474.png",
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-1-2_1f474-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-3_1f474-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-4_1f474-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-5_1f474-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-6_1f474-1f3ff_1f3ff.png`
+    },
+    P: {
+      0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_1f475.png",
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-1-2_1f475-1f3fb_1f3fb.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-3_1f475-1f3fc_1f3fc.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-4_1f475-1f3fd_1f3fd.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-5_1f475-1f3fe_1f3fe.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-6_1f475-1f3ff_1f3ff.png`
+    }
   },
-  woman: {
-    0: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_1f469.png`,
-    1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-1-2_1f469-1f3fb_1f3fb.png`,
-    2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-3_1f469-1f3fc_1f3fc.png`,
-    3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-4_1f469-1f3fd_1f3fd.png`,
-    4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-5_1f469-1f3fe_1f3fe.png`,
-    5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman_emoji-modifier-fitzpatrick-type-6_1f469-1f3ff_1f3ff.png`
-  },
-  olderMan: {
-    0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_1f474.png",
-    1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-1-2_1f474-1f3fb_1f3fb.png`,
-    2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-3_1f474-1f3fc_1f3fc.png`,
-    3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-4_1f474-1f3fd_1f3fd.png`,
-    4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-5_1f474-1f3fe_1f3fe.png`,
-    5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-man_emoji-modifier-fitzpatrick-type-6_1f474-1f3ff_1f3ff.png`
-  },
-  olderWoman: {
-    0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_1f475.png",
-    1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-1-2_1f475-1f3fb_1f3fb.png`,
-    2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-3_1f475-1f3fc_1f3fc.png`,
-    3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-4_1f475-1f3fd_1f3fd.png`,
-    4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-5_1f475-1f3fe_1f3fe.png`,
-    5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/older-woman_emoji-modifier-fitzpatrick-type-6_1f475-1f3ff_1f3ff.png`
+  U: {
+    U: {
+      0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/person-bald_1f9d1-200d-1f9b2.png",
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/person-light-skin-tone-bald_1f9d1-1f3fb-200d-1f9b2.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/person-medium-light-skin-tone-bald_1f9d1-1f3fc-200d-1f9b2.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/person-medium-skin-tone-bald_1f9d1-1f3fd-200d-1f9b2.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/person-medium-dark-skin-tone-bald_1f9d1-1f3fe-200d-1f9b2.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/person-dark-skin-tone-bald_1f9d1-1f3ff-200d-1f9b2.png`
+    },
+    L: {
+      0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-bald_1f468-200d-1f9b2.png",
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-bald-light-skin-tone_1f468-1f3fb-200d-1f9b2.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-bald-medium-light-skin-tone_1f468-1f3fc-200d-1f9b2.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-bald-medium-skin-tone_1f468-1f3fd-200d-1f9b2.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-bald-medium-dark-skin-tone_1f468-1f3fe-200d-1f9b2.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/man-bald-dark-skin-tone_1f468-1f3ff-200d-1f9b2.png`
+    },
+    P: {
+      0: "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-bald_1f469-200d-1f9b2.png",
+      1: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-bald-light-skin-tone_1f469-1f3fb-200d-1f9b2.png`,
+      2: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-bald-medium-light-skin-tone_1f469-1f3fc-200d-1f9b2.png`,
+      3: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-bald-medium-skin-tone_1f469-1f3fd-200d-1f9b2.png`,
+      4: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-bald-medium-dark-skin-tone_1f469-1f3fe-200d-1f9b2.png`,
+      5: `https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/woman-bald-dark-skin-tone_1f469-1f3ff-200d-1f9b2.png`
+    }
   }
 };
 
-const getRecoveredEmoji = (node, isMonochrome) =>
-  emojis.recovered[isMale(node) ? "male" : "female"][
-    getVariant(node, isMonochrome)
-  ];
+const metaMapper = pasien => ({
+  age: getAgeKey(pasien),
+  gender: ["P", "L", "U"][pasien.jenis_kelamin],
+  status: ["Meninggal", "Sembuh", "Masih Dirawat"][pasien.id_status],
+  variant: ((pasien.id_pasien * pasien.umur) % 5) + 1
+});
 
-const sortByKasus = (nodeA, nodeB) => nodeA.kasus - nodeB.kasus;
+const emojiMapper = meta => ({
+  src:
+    meta.age === "B"
+      ? emojis[meta.age][meta.variant]
+      : emojis[meta.age][meta.gender][meta.variant],
+  status: meta.status
+});
 
-const getEmoji = (node, isMonochrome) => {
-  // console.log(
-  //   isMale(node),
-  //   node.gender,
-  //   node.genderid,
-  //   node.genderxid,
-  //   node.kasus
-  // );
-  // if (isDead(node)) {
-  //   return "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png";
-  // }
+const sortByKasus = (pasienA, pasienB) =>
+  pasienA.kode_pasien - pasienB.kode_pasien;
 
-  // if (isRecovered(node)) {
-  //   return getRecoveredEmoji(node, isMonochrome);
-  // }
-  if (isBaby(node)) {
-    return emojis.baby[getVariant(node, isMonochrome)];
-  }
-  if (isYoung(node)) {
-    return emojis[isMale(node) ? "boy" : "girl"][
-      getVariant(node, isMonochrome)
-    ];
-  }
-  if (isAdultBelow50(node)) {
-    return emojis[isMale(node) ? "man" : "woman"][
-      getVariant(node, isMonochrome)
-    ];
-  } else {
-    return emojis[isMale(node) ? "olderMan" : "olderWoman"][
-      getVariant(node, isMonochrome)
-    ];
-  }
-};
+// const getEmoji = (node, isMonochrome) => {
+//   if (!node.jenis_kelamin)
+//     console.log(isMale(node), node.umur, node.jenis_kelamin);
+//   //   node.gender,
+//   //   node.genderid,
+//   //   node.genderxid,
+//   //   node.kasus
+//   // );
+//   // if (isDead(node)) {
+//   //   return "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png";
+//   // }
 
-const srcToImg = ({ src, node, isNodeDead, isNodeRecovered }) =>
-  isNodeDead
-    ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/coffin_26b0.png" /></div>`
-    : isNodeRecovered
-    ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/seedling_1f331.png" /></div>`
-    : `<img src="${src}" class="person" ${
-        isDev
-          ? `data="${Object.entries(node)
-              .map(d => d.join("="))
-              .join("&")}"`
-          : ""
-      } />`;
+//   // if (isRecovered(node)) {
+//   //   return getRecoveredEmoji(node, isMonochrome);
+//   // }
+//   if (isBaby(node)) {
+//     return emojis.baby[getVariant(node, isMonochrome)];
+//   }
+//   if (isYoung(node)) {
+//     return emojis[isMale(node) ? "boy" : "girl"][
+//       getVariant(node, isMonochrome)
+//     ];
+//   }
+//   if (isAdultBelow50(node)) {
+//     return emojis[isMale(node) ? "man" : "woman"][
+//       getVariant(node, isMonochrome)
+//     ];
+//   } else {
+//     return emojis[isMale(node) ? "olderMan" : "olderWoman"][
+//       getVariant(node, isMonochrome)
+//     ];
+//   }
+// };
+
+const srcToImg = ({ src, status }) =>
+  status === "Meninggal"
+    ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/cross-mark_274c.png" /></div>`
+    : status === "Sembuh"
+    ? `<div class="person"><img class="img back" src="${src}" /><img class="img front" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/white-heavy-check-mark_2705.png" /></div>`
+    : `<img src="${src}" class="person" />`;
 
 export default async function handler(req: NowRequest, res: NowResponse) {
   try {
@@ -155,16 +213,12 @@ export default async function handler(req: NowRequest, res: NowResponse) {
       isDev &&
       (process.env.OG_HTML_DEBUG === "1" || req.query.debug === "true");
     const isMonochrome = req.query.mono === "true";
-    const [{ data }] = await Promise.all([fetchCaseGraph()]);
+    const data = await fetchCaseGraph();
     // res.json({ cases });
     const sorted = data.sort(sortByKasus);
     const emojis = sorted
-      .map(n => ({
-        src: getEmoji(n, isMonochrome),
-        node: n,
-        isNodeDead: isDead(n),
-        isNodeRecovered: isRecovered(n)
-      }))
+      .map(metaMapper)
+      .map(emojiMapper)
       .map(srcToImg);
 
     const html = getHtml({
