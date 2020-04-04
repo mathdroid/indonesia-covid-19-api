@@ -1,7 +1,7 @@
 import unfetch from "isomorphic-unfetch";
 import withRetry from "@zeit/fetch-retry";
 
-const fetch = withRetry(unfetch);
+export const fetch = withRetry(unfetch);
 
 import { fetchFeatures, extractSingleValue } from "./data";
 import { createArrayQuery, where } from "./query";
