@@ -148,9 +148,9 @@ const emojis = {
 
 const metaMapper = pasien => ({
   age: getAgeKey(pasien),
-  gender: ["P", "L", "U"][pasien.jenis_kelamin],
-  status: ["Meninggal", "Sembuh", "Masih Dirawat"][pasien.id_status],
-  variant: ((pasien.id_pasien * pasien.umur) % 5) + 1
+  gender: ["P", "L", "U"][pasien.jenis_kelamin ?? 2],
+  status: ["Meninggal", "Sembuh", "Masih Dirawat"][pasien.id_status ?? 2],
+  variant: ((pasien.id_pasien * (pasien.umur ?? 0)) % 5) + 1
 });
 
 const emojiMapper = meta => ({
