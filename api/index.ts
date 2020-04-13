@@ -34,6 +34,12 @@ export default async (_, response: NowResponse) => {
     perHari: {
       json: "https://indonesia-covid-19.mathdro.id/api/harian",
       csv: "https://indonesia-covid-19.mathdro.id/api/harian.csv"
+    },
+    wismaAtlet:{
+      json: "https://indonesia-covid-19.mathdro.id/api/wisma-atlet",
+      karyawan: "https://indonesia-covid-19.mathdro.id/api/wisma-atlet/karyawan",
+      ruangan: "https://indonesia-covid-19.mathdro.id/api/wisma-atlet/ruangan",
+      kasur: "https://indonesia-covid-19.mathdro.id/api/wisma-atlet/kasur"
     }
   });
 };
