@@ -139,3 +139,35 @@ export const fetchWismaAtlet = async () => {
     {}
   );
 };
+
+export const fetchWismaAtletRuangan = async () => {
+  return await fetch(`https://u071.zicare.id/masterdata/getRuangRawat`, {
+    method: "POST",
+    body: JSON.stringify({}),
+    headers: {
+      "x-requested-with": "XMLHttpRequest"
+    }
+  }).then(res => res.json());
+};
+
+export const fetchWismaAtletKaryawan = async () => {
+  return await fetch(`https://u071.zicare.id/masterdata/getKaryawan`, {
+    method: "POST",
+    body: JSON.stringify({}),
+    headers: {
+      "x-requested-with": "XMLHttpRequest"
+    }
+  }).then(res => res.json());
+};
+
+export const fetchKasur = async () => {
+  return await fetch("https://u071.zicare.id/house/getBedStatus", {
+    method: "POST",
+    headers: {
+      "x-requested-with": "XMLHttpRequest"
+    },
+    body: JSON.stringify({
+      jns_rr: ["RU", "RA", "ICU", "HCU"]
+    })
+  }).then(res => res.json());
+};
