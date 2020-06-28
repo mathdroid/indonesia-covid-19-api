@@ -23,6 +23,10 @@
 
 - /api/harian.csv : Indonesian cases per day in CSV file
 
+## Showcase
+
+- [https://github.com/lovanto/covid-today](https://github.com/lovanto/covid-today), (HTML+JS) by [Rifky Lovanto](https://github.com/lovanto)
+
 ### License
 
 MIT License 2020, mathdroid.
