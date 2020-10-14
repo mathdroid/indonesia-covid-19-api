@@ -1,4 +1,4 @@
-import { NowResponse } from "@now/node";
+import { NowResponse } from "@vercel/node";
 
 import { fetchProvinsiData } from "../../util/fetcher";
 

@@ -1,4 +1,4 @@
-import { NowResponse, NowRequest } from "@now/node";
+import { NowResponse, NowRequest } from "@vercel/node";
 import { getHtml } from "../../util/template";
 import { writeTempFile, pathToFileURL } from "../../util/file";
 import { getScreenshot } from "../../util/chromium";

@@ -23,8 +23,8 @@
     "swr": "^0.1.18"
   },
   "devDependencies": {
-    "@now/node": "^1.4.1",
     "@types/qs": "^6.9.1",
+    "@vercel/node": "^1.8.4",
     "typescript": "^3.8.3"
   }
 }

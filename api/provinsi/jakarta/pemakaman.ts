@@ -1,5 +1,5 @@
 import { fetch } from "../../../util/fetcher";
-import { NowResponse } from "@now/node";
+import { NowResponse } from "@vercel/node";
 
 export default async (_req, res: NowResponse) => {
   const raw = await fetch(
