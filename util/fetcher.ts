@@ -24,6 +24,24 @@ export const fetchDaily = (date = new Date()) => {
   return fetchFeatures(endpoints.statistikPerkembangan, query);
 };
 
+export const fetchLastUpdate = async () => {
+  const query = {
+    f: "json",
+    returnGeometry: false,
+    spatialRel: `esriSpatialRelIntersects`,
+    outFields: `*`,
+    cacheHint: true,
+    // Temp fix using last update
+    where: where.lastUpdate(),
+    outStatistics: `[{statisticType: "max",onStatisticField: "Tanggal",outStatisticFieldName: "value"}]`
+  };
+  const result = extractSingleValue(
+    await fetchFeatures(endpoints.statistikPerkembangan, query)
+  );
+
+  return result > 0 ? result : null;
+};
+
 export const fetchMeninggal = async (date = new Date()) => {
   const query = {
     f: "json",
@@ -31,9 +49,12 @@ export const fetchMeninggal = async (date = new Date()) => {
     spatialRel: `esriSpatialRelIntersects`,
     outFields: `*`,
     cacheHint: true,
-
-    where: where.currentDay(date),
-    outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Meninggal",outStatisticFieldName: "value"}]`
+    // Temp fix using last update
+    where: (date) ? where.currentDay(date) : where.lastUpdate(),
+    outStatistics: (date) ? `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Meninggal",outStatisticFieldName: "value"}]` : `[{statisticType: "max",onStatisticField: "Jumlah_Pasien_Meninggal",outStatisticFieldName: "value"}]`
+    // END
+    // where: where.currentDay(date),
+    // outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Meninggal",outStatisticFieldName: "value"}]`
   };
   const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)
@@ -49,9 +70,12 @@ export const fetchSembuh = async (date = new Date()) => {
     spatialRel: `esriSpatialRelIntersects`,
     outFields: `*`,
     cacheHint: true,
-
-    where: where.currentDay(date),
-    outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Sembuh",outStatisticFieldName: "value"}]`
+    // Temp fix using last update
+    where: (date) ? where.currentDay(date) : where.lastUpdate(),
+    outStatistics: (date) ? `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Sembuh",outStatisticFieldName: "value"}]` : `[{statisticType: "max",onStatisticField: "Jumlah_Pasien_Sembuh",outStatisticFieldName: "value"}]`
+    // END
+    // where: where.currentDay(date),
+    // outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Pasien_Sembuh",outStatisticFieldName: "value"}]`
   };
   const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)
@@ -67,9 +91,12 @@ export const fetchDalamPerawatan = async (date = new Date()) => {
     spatialRel: `esriSpatialRelIntersects`,
     outFields: `*`,
     cacheHint: true,
-
-    where: where.currentDay(date),
-    outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_pasien_dalam_perawatan",outStatisticFieldName: "value"}]`
+    // Temp fix using last update
+    where: (date) ? where.currentDay(date) : where.lastUpdate(),
+    outStatistics: (date) ? `[{statisticType: "sum",onStatisticField: "Jumlah_pasien_dalam_perawatan",outStatisticFieldName: "value"}]` : `[{statisticType: "max",onStatisticField: "Jumlah_pasien_dalam_perawatan",outStatisticFieldName: "value"}]`
+    // END
+    // where: where.currentDay(date),
+    // outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_pasien_dalam_perawatan",outStatisticFieldName: "value"}]`
   };
   const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)
@@ -85,9 +112,12 @@ export const fetchJumlahKasus = async (date = new Date()) => {
     spatialRel: `esriSpatialRelIntersects`,
     outFields: `*`,
     cacheHint: true,
-
-    where: where.currentDay(date),
-    outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
+    // Temp fix using last update
+    where: (date) ? where.currentDay(date) : where.lastUpdate(),
+    outStatistics: (date) ? `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]` : `[{statisticType: "max",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
+    // END
+    // where: where.currentDay(date),
+    // outStatistics: `[{statisticType: "sum",onStatisticField: "Jumlah_Kasus_Kumulatif",outStatisticFieldName: "value"}]`
   };
   const result = extractSingleValue(
     await fetchFeatures(endpoints.statistikPerkembangan, query)

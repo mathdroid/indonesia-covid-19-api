@@ -4,22 +4,25 @@ import {
   fetchMeninggal,
   fetchSembuh,
   fetchDalamPerawatan,
-  fetchJumlahKasus
+  fetchJumlahKasus,
+  fetchLastUpdate
 } from "../util/fetcher";
 
 export default async (_, response: NowResponse) => {
-  const [meninggal, sembuh, perawatan, jumlahKasus] = await Promise.all([
+  const [meninggal, sembuh, perawatan, jumlahKasus, lastUpdate] = await Promise.all([
     fetchMeninggal(),
     fetchSembuh(),
     fetchDalamPerawatan(),
-    fetchJumlahKasus()
+    fetchJumlahKasus(),
+    fetchLastUpdate()
   ]);
 
   response.json({
-    meninggal,
-    sembuh,
     perawatan,
+    sembuh,
+    meninggal,
     jumlahKasus,
+    lastUpdate,
 
     perKasus: {
       json: "https://indonesia-covid-19.mathdro.id/api/kasus",
