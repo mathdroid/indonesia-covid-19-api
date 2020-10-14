@@ -17,7 +17,8 @@ export const where = {
       addDays(date, -1)
     )} 17:00:00' AND Tanggal<=timestamp '${getISODate(date)} 16:59:59')`,
   beforeToday: (date: Date) =>
-    `Tanggal<timestamp '${getISODate(date)} 17:00:00'`
+    `Tanggal<timestamp '${getISODate(date)} 17:00:00'`,
+  lastUpdate: () => `Jumlah_Kasus_Kumulatif IS NOT NULL AND Jumlah_Pasien_Sembuh IS NOT NULL AND Jumlah_Pasien_Meninggal IS NOT NULL`
 };
 
 export const createQuery = ({ where }) => ({
